@@ -2,7 +2,7 @@ extern crate dirs;
 extern crate log;
 extern crate simplelog;
 use anyhow::Result;
-use mycrate::cli;
+use bytecode::cli;
 use simplelog::*;
 use std::fs::File;
 
@@ -15,7 +15,7 @@ fn init_logging() {
 
     let log_file_path = dirs::state_dir()
         .expect("Could not get state dir")
-        .join("crate.log");
+        .join("bytecode.log");
 
     println!("Logging to {:?}", log_file_path);
 
