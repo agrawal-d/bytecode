@@ -1,6 +1,5 @@
-use std::collections::HashMap;
-
 use log::*;
+use std::collections::HashMap;
 
 use crate::{
     common::*,
@@ -9,9 +8,9 @@ use crate::{
 
 #[derive(Default)]
 pub struct Chunk {
-    code: Vec<u8>,
-    lines: HashMap<usize, usize>,
-    constants: ValueArray,
+    pub code: Vec<u8>,
+    pub lines: HashMap<usize, usize>,
+    pub constants: ValueArray,
 }
 
 impl Chunk {
@@ -25,9 +24,9 @@ impl Chunk {
         self.constants.len() - 1
     }
 
-    pub(crate) fn write_constant(&mut self, constant: usize, line: usize) {
+    pub(crate) fn write_constant(&mut self, constant_index: usize, line: usize) {
         self.write_chunk(Opcode::Constant, line);
-        self.code.push(constant.try_into().unwrap());
+        self.code.push(constant_index.try_into().unwrap());
     }
 }
 
@@ -39,12 +38,12 @@ impl Chunk {
         let mut offset = 0;
         while offset < self.code.len() {
             offset = self.disassemble_instruction(offset);
-            info!("----");
         }
 
         println!("====");
     }
 
+    #[cfg(feature = "tracing")]
     pub fn disassemble_instruction(&self, offset: usize) -> usize {
         print!("{offset:04} ");
         print!("{:4} ", self.lines[&offset]);
@@ -63,6 +62,11 @@ impl Chunk {
         println!();
 
         ret
+    }
+
+    #[cfg(not(feature = "tracing"))]
+    pub fn disassemble_instruction(&self, offset: usize) -> usize {
+        self.code.len()
     }
 
     fn simple_instruction(&self, instruction: Opcode, offset: usize) -> usize {
@@ -86,7 +90,21 @@ impl Chunk {
         offset + 2
     }
 
-    fn print_value(&self, value: Value) {
+    #[cfg(feature = "tracing")]
+    pub fn print_value(&self, value: Value) {
         print!("Value {value}");
     }
+
+    #[cfg(not(feature = "tracing"))]
+    pub fn print_value(&self, value: Value) {
+        print!("Value {value}");
+    }
+
+    #[cfg(feature = "tracing")]
+    pub fn line() {
+        println!();
+    }
+
+    #[cfg(not(feature = "tracing"))]
+    pub fn line() {}
 }

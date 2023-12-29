@@ -22,7 +22,7 @@ fn init_logging() {
 
     CombinedLogger::init(vec![
         TermLogger::new(
-            LevelFilter::Warn,
+            LevelFilter::Info,
             config.clone(),
             TerminalMode::Mixed,
             ColorChoice::Auto,

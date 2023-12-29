@@ -1,6 +1,8 @@
-# Rust starter repository
+# Bytecode
 
-I use this repository as a starter for my Rust projects.
+A interpteter for a programming language, that implements a bytecode IR and VM.
+
+Based on the book Crafting Interpreters.
 
 # Licence
 
