@@ -11,3 +11,6 @@ anyhow = { version = "1.0.75", features = ["backtrace"] }
 simplelog = { version = "^0.12.1", features = ["paris"] }
 dirs = "5.0.1"
 clap = { version = "4.3.0", features = ["derive"] }
+num_enum = "0.7.1"
+strum = "0.25.0"
+strum_macros = "0.25.3"

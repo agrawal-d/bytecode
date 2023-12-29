@@ -3,6 +3,7 @@ extern crate log;
 extern crate simplelog;
 use anyhow::Result;
 use bytecode::cli;
+use bytecode::dbg;
 use simplelog::*;
 use std::fs::File;
 
@@ -38,6 +39,6 @@ fn init_logging() {
 fn main() -> Result<()> {
     init_logging();
     let _args = cli::parse_args();
-    info!("Hello World!");
+    dbg()?;
     Ok(())
 }
