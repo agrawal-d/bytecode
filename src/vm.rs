@@ -13,6 +13,17 @@ enum InterpretError {
     RuntimeError,
 }
 
+macro_rules! binop {
+        ($vm: ident, $op: tt) => {
+            {
+                let b = $vm.stack.pop().context("Stack underflow")?;
+                let a = $vm.stack.pop().context("Stack underflow")?;
+                let result = a $op b;
+                $vm.stack.push(result);
+            }
+        };
+}
+
 impl Vm {
     fn new(chunk: Chunk) -> Vm {
         Vm {
@@ -78,6 +89,14 @@ impl Vm {
                         .context("Could not interpret constant opcode")?;
                     vm.stack.push(constant);
                 }
+                Opcode::Negate => {
+                    let value = vm.stack.pop().context("Nothing in stack to negate")?;
+                    vm.stack.push(-value);
+                }
+                Opcode::Add => binop!(vm, +),
+                Opcode::Subtract => binop!(vm, -),
+                Opcode::Multiply => binop!(vm, *),
+                Opcode::Divide => binop!(vm, /),
             }
         }
     }

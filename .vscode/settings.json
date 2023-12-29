@@ -1,8 +1,0 @@
-{
-    "rust-analyzer.linkedProjects": [
-        "./Cargo.toml"
-    ],
-    "rust-analyzer.showUnlinkedFileNotification": false,
-    "editor.formatOnSave": true,
-    "editor.formatOnType": true
-}

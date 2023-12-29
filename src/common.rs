@@ -5,4 +5,9 @@ use num_enum::{IntoPrimitive, TryFromPrimitive};
 pub enum Opcode {
     Return,
     Constant,
+    Negate,
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
 }
