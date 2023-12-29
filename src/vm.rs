@@ -8,11 +8,6 @@ pub struct Vm {
     stack: Vec<Value>,
 }
 
-enum InterpretError {
-    CompileError,
-    RuntimeError,
-}
-
 macro_rules! binop {
         ($vm: ident, $op: tt) => {
             {
