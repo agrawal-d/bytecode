@@ -17,19 +17,8 @@ pub mod scanner;
 pub mod value;
 pub mod vm;
 
-pub fn interpret2(line: String) -> Result<()> {
-    let mut chunk = Chunk::default();
-    let constant = chunk.add_constant(5.0);
-    chunk.write_constant(constant, 123);
-    let constant1 = chunk.add_constant(2.0);
-    chunk.write_constant(constant1, 123);
-    chunk.write_chunk(Opcode::Divide, 123);
-    chunk.write_chunk(Opcode::Return, 123);
-    Vm::interpret(chunk).context("Failed to interpret chunk")
-}
-
 pub fn interpret(source: String) -> Result<()> {
-    let code = Rc::new(source);
+    let code: Rc<str> = Rc::from(source);
     compile(code)?;
     Ok(())
 }

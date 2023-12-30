@@ -1,8 +1,9 @@
 use crate::scanner::{Scanner, Token, TokenType};
 use anyhow::*;
+use log::error;
 use std::rc::Rc;
 
-pub fn compile(source: Rc<String>) -> Result<()> {
+pub fn compile(source: Rc<str>) -> Result<()> {
     let line: usize = 0;
     let mut scanner = Scanner::new(source);
 
@@ -13,7 +14,9 @@ pub fn compile(source: Rc<String>) -> Result<()> {
 
         match token.typ {
             TokenType::EOF => break,
-            _ => todo!(),
+            _ => {
+                error!("Unexpected token {:?}", token);
+            }
         };
     }
 

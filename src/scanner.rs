@@ -1,29 +1,47 @@
 use anyhow::*;
-use std::rc::Rc;
+use std::{collections::HashMap, rc::Rc, sync::OnceLock};
 
 pub struct Scanner {
     start: usize,
     current: usize,
-    source: Rc<String>,
+    source: Rc<str>,
     pub line: usize,
 }
 
+#[derive(Debug)]
 pub struct Token {
     pub typ: TokenType,
-    pub source: Rc<String>,
-    pub start: usize,
-    pub end: usize,
+    pub source: Rc<str>,
     pub line: usize,
 }
 
 impl Scanner {
-    pub fn new(source: Rc<String>) -> Scanner {
+    pub fn new(source: Rc<str>) -> Scanner {
         Scanner {
             start: 0,
             current: 0,
             source,
             line: 1,
         }
+    }
+
+    fn get_ident_tokentype_map() -> &'static HashMap<&'static str, TokenType> {
+        static HASHMAP: OnceLock<HashMap<&'static str, TokenType>> = OnceLock::new();
+        HASHMAP.get_or_init(|| {
+            let mut m = HashMap::new();
+            m.insert("and", TokenType::And);
+            m.insert("class", TokenType::Class);
+            m.insert("else", TokenType::Else);
+            m.insert("if", TokenType::If);
+            m.insert("nil", TokenType::Nil);
+            m.insert("or", TokenType::Or);
+            m.insert("print", TokenType::Print);
+            m.insert("return", TokenType::Return);
+            m.insert("super", TokenType::Super);
+            m.insert("var", TokenType::Var);
+            m.insert("while", TokenType::While);
+            m
+        })
     }
 
     pub fn scan_token(&mut self) -> Token {
@@ -85,7 +103,18 @@ impl Scanner {
                 }
             }
             '"' => self.string(),
-            other => self.error_token(format!("Unexpected character: {}", other)),
+            c => {
+                if c.is_ascii_digit() {
+                    self.number()
+                } else if c.is_alphabetic() {
+                    self.identifier()
+                } else {
+                    self.error_token(format!(
+                        "Unexpected character '{}' at position {}",
+                        c, self.start
+                    ))
+                }
+            }
         }
     }
 
@@ -108,7 +137,6 @@ impl Scanner {
         }
 
         self.source
-            .as_str()
             .chars()
             .nth(self.current)
             .unwrap_or_else(|| panic!("Could not get {}th  character", self.current))
@@ -120,7 +148,6 @@ impl Scanner {
         }
 
         self.source
-            .as_str()
             .chars()
             .nth(self.current + 1)
             .unwrap_or_else(|| panic!("Could not get {}th  character", self.current + 1))
@@ -130,7 +157,6 @@ impl Scanner {
         self.current += 1;
         return self
             .source
-            .as_str()
             .chars()
             .nth(self.current - 1)
             .unwrap_or_else(|| panic!("Could not get {}th  character", self.current - 1));
@@ -149,9 +175,7 @@ impl Scanner {
     fn make_token(&self, typ: TokenType) -> Token {
         Token {
             typ,
-            source: self.source.clone(),
-            start: self.start,
-            end: self.current,
+            source: self.source[self.start..self.current].into(),
             line: self.line,
         }
     }
@@ -159,9 +183,7 @@ impl Scanner {
     fn error_token(&self, msg: String) -> Token {
         Token {
             typ: TokenType::Error,
-            start: 0,
-            end: msg.len() - 1,
-            source: Rc::new(msg),
+            source: Rc::from(msg),
             line: self.line,
         }
     }
@@ -183,9 +205,40 @@ impl Scanner {
 
         self.make_token(TokenType::String)
     }
+
+    fn number(&mut self) -> Token {
+        while self.peek().is_ascii_digit() {
+            self.advance();
+        }
+
+        if self.peek() == '.' && self.peek2().is_ascii_digit() {
+            self.advance();
+
+            while self.peek().is_ascii_digit() {
+                self.advance();
+            }
+        }
+
+        self.make_token(TokenType::Number)
+    }
+
+    fn identifier(&mut self) -> Token {
+        while self.peek().is_alphanumeric() {
+            self.advance();
+        }
+
+        self.make_token(self.identifier_type())
+    }
+
+    fn identifier_type(&self) -> TokenType {
+        let text: &str = &self.source[self.start..self.current];
+        *Scanner::get_ident_tokentype_map()
+            .get(text)
+            .unwrap_or(&TokenType::Identifier)
+    }
 }
 
-#[derive(strum_macros::Display)]
+#[derive(strum_macros::Display, Debug, Copy, Clone)]
 pub enum TokenType {
     // Single char
     LeftParen,
