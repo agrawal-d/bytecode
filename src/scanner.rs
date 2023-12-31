@@ -8,11 +8,21 @@ pub struct Scanner {
     pub line: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
     pub typ: TokenType,
     pub source: Rc<str>,
     pub line: usize,
+}
+
+impl Token {
+    pub fn new() -> Token {
+        Token {
+            typ: TokenType::Error,
+            source: Rc::from(""),
+            line: 0,
+        }
+    }
 }
 
 impl Scanner {
@@ -238,7 +248,7 @@ impl Scanner {
     }
 }
 
-#[derive(strum_macros::Display, Debug, Copy, Clone)]
+#[derive(strum_macros::Display, PartialEq, Eq, Debug, Copy, Clone)]
 pub enum TokenType {
     // Single char
     LeftParen,

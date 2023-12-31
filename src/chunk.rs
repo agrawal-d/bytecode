@@ -14,9 +14,13 @@ pub struct Chunk {
 }
 
 impl Chunk {
-    pub fn write_chunk(&mut self, opcode: Opcode, line: usize) {
+    pub fn write_opcode(&mut self, opcode: Opcode, line: usize) {
+        self.write_byte(opcode as u8, line);
+    }
+
+    pub fn write_byte(&mut self, byte: u8, line: usize) {
         self.lines.insert(self.code.len(), line);
-        self.code.push(opcode as u8);
+        self.code.push(byte);
     }
 
     pub fn add_constant(&mut self, value: Value) -> usize {
@@ -25,7 +29,7 @@ impl Chunk {
     }
 
     pub(crate) fn write_constant(&mut self, constant_index: usize, line: usize) {
-        self.write_chunk(Opcode::Constant, line);
+        self.write_opcode(Opcode::Constant, line);
         self.code.push(constant_index.try_into().unwrap());
     }
 }

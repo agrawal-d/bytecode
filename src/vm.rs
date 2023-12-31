@@ -20,7 +20,7 @@ macro_rules! binop {
 }
 
 impl Vm {
-    fn new(chunk: Chunk) -> Vm {
+    pub fn new(chunk: Chunk) -> Vm {
         Vm {
             chunk,
             ip: 0,
@@ -94,5 +94,9 @@ impl Vm {
                 Opcode::Divide => binop!(vm, /),
             }
         }
+    }
+
+    pub fn run(&self) -> Result<()> {
+        todo!()
     }
 }

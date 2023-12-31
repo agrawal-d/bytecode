@@ -5,7 +5,7 @@
 use anyhow::*;
 use chunk::Chunk;
 use common::Opcode;
-use compiler::compile;
+use compiler::Compiler;
 use std::rc::Rc;
 use vm::Vm;
 
@@ -18,7 +18,9 @@ pub mod value;
 pub mod vm;
 
 pub fn interpret(source: String) -> Result<()> {
-    let code: Rc<str> = Rc::from(source);
-    compile(code)?;
+    let chunk = Compiler::compile(Rc::from(source))?;
+    let mut vm = Vm::new(chunk);
+    vm.run()?;
+
     Ok(())
 }
